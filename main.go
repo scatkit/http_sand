@@ -1,16 +1,20 @@
 package main
+import "fmt"
 
-import (
-	"log"
-)
+func fetchTasks(baseURL, availability string) []Issue {
+  
+  var limit int
+  switch availability{
+  case "Low":
+    limit = 1
+  case "Medium":
+    limit = 3
+  default:
+    limit = 5
+  }
 
-func main() {
-	baseURL := "https://api.boot.dev/v1/courses_rest_api/learn-http/users"
-
-	users, err := getUsers(baseURL)
-	if err != nil {
-		log.Fatal(err)
-	}
-	logUsers(users)
-
+  query := fmt.Sprintf("?sort=estimate&limit=%v", limit)
+	fullURL := baseURL + query
+  fmt.Println(fullURL)
+	return getIssues(fullURL)
 }
