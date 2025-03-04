@@ -1,63 +1,32 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
+	"fmt"
 	"net/http"
 )
 
-func updateUser(baseURL, id, apiKey string, data User) (User, error) {
-	fullURL := baseURL + "/" + id
+func deleteUser(baseURL, id, apiKey string) error {
+	fullURL := baseURL + "/" + id 
   
-  jsonPayload, err := json.Marshal(data)
+  req, err := http.NewRequest("DELETE", fullURL, nil)
   if err != nil{
-    return User{}, nil
+    return err
   }
   
-  req, err := http.NewRequest("PUT", fullURL, bytes.NewReader(jsonPayload))
-  if err != nil{
-    return User{}, nil
-  }
-  
-  req.Header.Set("X-Api-Key", apiKey )
+  req.Header.Set("X-Api-Key", apiKey)
   
   cl := &http.Client{}
+  
   resp, err := cl.Do(req)
   if err != nil{
-    return User{}, nil
+    return err
   }
   
   defer resp.Body.Close()
   
-  var out User
-  if err := json.NewDecoder(resp.Body).Decode(&out); err != nil{
-    return User{}, nil
+  if resp.StatusCode > 299{
+    return fmt.Errorf("User not deleted: %d", resp.StatusCode)
   }
   
-  return out, nil
-}
-
-func getUserById(baseURL, id, apiKey string) (User, error) {
-	fullURL := baseURL + "/" + id
-  req, err := http.NewRequest("GET", fullURL, nil)
-  if err != nil{
-    return User{}, nil
-  }
-  
-  req.Header.Set("Content-Type", "application/json")
-  req.Header.Set("X-Api-Key", apiKey )
-  
-  cl := &http.Client{}
-  resp, err := cl.Do(req)
-  if err != nil{
-    return User{}, nil
-  }
-  defer resp.Body.Close()
-  
-  var out User
-  if err := json.NewDecoder(resp.Body).Decode(&out); err != nil{
-    return User{}, nil
-  }
-  
-  return out, nil
+  return nil
 }

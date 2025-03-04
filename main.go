@@ -2,32 +2,38 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 )
 
 func main() {
-	userId := "2f8282cb-e2f9-496f-b144-c0aa4ced56db"
-	baseURL := "https://api.boot.dev/v1/courses_rest_api/learn-http/users"
+	userId := "0194fdc2-fa2f-4cc0-81d3-ff12045b73c8"
+	url := "https://api.boot.dev/v1/courses_rest_api/learn-http/users"
 	apiKey := generateKey()
 
-	userData, err := getUserById(baseURL, userId, apiKey)
+	users, err := getUsers(url, apiKey)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatal(err)
 	}
-	logUser(userData)
+	fmt.Println("Logging user records:")
+	logUsers(users)
+	fmt.Println("---")
 
-	fmt.Printf("Updating user with id: %s\n", userData.ID)
-	userData.Role = "Senior Backend Developer"
-	userData.Experience = 7
-	userData.Remote = true
-	userData.User.Name = "Allan"
-
-	updatedUser, err := updateUser(baseURL, userId, apiKey, userData)
+	err = deleteUser(url, userId, apiKey)
 	if err != nil {
-		fmt.Println(err)
-		return
+		log.Fatal(err)
 	}
-	logUser(updatedUser)
+	fmt.Printf("Deleted user with id: %s\n", userId)
+	fmt.Println("---")
+
+	newUsers, err := getUsers(url, apiKey)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logUsers(newUsers)
+	fmt.Println("---")
+  
+  fmt.Println(len(users)-len(newUsers))
 }
 
 func generateKey() string {
