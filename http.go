@@ -1,32 +1,24 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 )
 
-func deleteUser(baseURL, id, apiKey string) error {
-	fullURL := baseURL + "/" + id 
-  
-  req, err := http.NewRequest("DELETE", fullURL, nil)
-  if err != nil{
-    return err
-  }
-  
-  req.Header.Set("X-Api-Key", apiKey)
-  
-  cl := &http.Client{}
-  
-  resp, err := cl.Do(req)
-  if err != nil{
-    return err
-  }
-  
-  defer resp.Body.Close()
-  
-  if resp.StatusCode > 299{
-    return fmt.Errorf("User not deleted: %d", resp.StatusCode)
-  }
-  
-  return nil
+func getUsers(url string) ([]User, error) {
+	fullURL := url
+	res, err := http.Get(fullURL)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	var users []User
+	decoder := json.NewDecoder(res.Body)
+	err = decoder.Decode(&users)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }
