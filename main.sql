@@ -1,10 +1,4 @@
-alter table users
-rename column name to user_name;
-
-alter table users
-add column is_edited boolean;
-
-alter table users
-drop column password;
-
+SELECT column_name, data_type, is_nullable
+FROM information_schema.columns
+WHERE table_name = 'users';
 
